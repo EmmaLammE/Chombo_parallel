@@ -1,0 +1,26 @@
+#inputs file for comparison utility program	
+
+#if "same size" is 1, then both "exact" and "computed" solutions are 
+#at the same resolution.  They can both be AMR solutions, but they should 
+#have the same grids
+compare.sameSize = 1
+#we're not doing a series of plotfiles here
+compare.isTimeDep = 0
+
+#name of file for "exact" solution (single-level fine-resolution solution)
+compare.exactRoot = ref_stream.L1L2.0128.petsc.000020.2d.hdf5
+
+
+#name of file containing "computed" solution (which may be AMR )
+compare.computedRoot = pf_nlevel2_nproc1_stream.L1L2.0128.petsc.000000.2d.hdf5
+
+
+#name of file into which to write error plotfile
+compare.errorRoot = compareOut_pf.hdf5
+
+#dump out a plotfile of the error?
+compare.doPlots = 1
+
+#which variables to compute error for
+compare.error_var = thickness
+

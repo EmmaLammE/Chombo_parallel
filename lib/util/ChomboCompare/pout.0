@@ -1,0 +1,11 @@
+numCrseStart 0
+exact Filename = ref_stream.L1L2.0128.petsc.000020.2d.hdf5
+computed Filename = pf_nlevel2_nproc1_stream.L1L2.0128.petsc.000000.2d.hdf5
+error Filename = compareOut_pf.hdf5
+error, step 0: L1, L2, Max, sum
+thickness: 6.2568e+09, 1.7377e+05, 9.4012e+00, -4.9092e+06
+
+Vector NSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEE: 24 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 24 bytes (0 Mb)
+peak memory usage: 6034650 bytes (5 Mb)
