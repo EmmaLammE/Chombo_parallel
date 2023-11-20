@@ -159,6 +159,25 @@ public:
   */
   explicit FArrayBox(std::istream& a_is);
 
+  
+  /// EL - print out all entries of this fab in a given a_subbox
+  virtual void printAll(const Box& a_subbox,int a_comp=0,int a_numcomp=1);
+  
+  /// EL - print out all entries of this fab
+  virtual void printAll(int a_comp=0,int a_numcomp=1);
+
+  /// EL - flatten the box into a single array
+  /// for temporal pack and send
+  virtual Real * flattenAll(const Box& a_subbox,int a_comp=0,int a_numcomp=1);
+
+  /// EL - unpack the single array into a box
+  /// for temporal unpack and receive
+  virtual void unpackAll(const Box& a_subbox,Real* flattened_box,int a_comp=0,int a_numcomp=1);
+
+  /// EL - unpack the single array into a box
+  /// for temporal unpack and receive
+  virtual void setSpecificValTest(const Box& a_subbox,int a_comp=0,int a_numcomp=1);
+
   ///
   /**
      Returns the Lp-norm of this FAB using components

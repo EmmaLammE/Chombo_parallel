@@ -59,6 +59,168 @@ FArrayBox::~FArrayBox()
 
 }
 
+void FArrayBox::printAll(const Box& a_subbox,int a_comp,int a_numcomp)
+{
+  CH_assert(m_domain.contains(a_subbox));
+  Real rowCount = 0;
+  // std::cout<<"in printAll in chombo, a_comp "<<a_comp<<",a_numcomp"<<a_numcomp<<endl;
+  ForAllThisCPencil(Real,a_subbox,a_comp,a_numcomp); // a_comp,a_numcomp
+  {
+    const Real* row = &thisR;
+    for (int i = 0; i < thisLen; i++)
+    {
+      cout<<"Row "<<rowCount<<", column "<<i<<": "<<row[i]<<endl;
+    }
+    rowCount++;
+  } EndForPencil
+}
+
+void FArrayBox::printAll(int a_comp,int a_numcomp)
+{
+  Real rowCount = 0;
+  ForAllThisCPencil(Real,m_domain,a_comp,a_numcomp); // a_comp,a_numcomp
+  {
+    const Real* row = &thisR;
+    for (int i = 0; i < thisLen; i++)
+    {
+      cout<<"Row "<<rowCount<<", column "<<i<<": "<<row[i]<<endl;
+    }
+    rowCount++;
+  } EndForPencil
+}
+
+Real* FArrayBox::flattenAll(const Box& a_subbox,int a_comp,int a_numcomp)
+{
+  CH_assert(m_domain.contains(a_subbox));
+  Real rowCount = 0;
+  Real num_entries = 0; // number of total entries in this box
+  ForAllThisCPencil(Real,a_subbox,a_comp,a_numcomp); // a_comp,a_numcomp
+  {
+    const Real* row = &thisR;
+    for (int i = 0; i < thisLen; i++)
+    {
+      // cout<<"Row "<<rowCount<<", column "<<i<<": "<<row[i]<<endl;
+      num_entries++;
+    }
+    rowCount++;
+  } EndForPencil
+  // cout<<" in flatten all, num_entries "<<num_entries<<endl;
+  Real *flattened_box = (Real *)calloc(num_entries, sizeof(Real));
+  int index=0;
+  ForAllThisCPencil(Real,a_subbox,a_comp,a_numcomp); // a_comp,a_numcomp
+  {
+    const Real* row = &thisR;
+    for (int i = 0; i < thisLen; i++)
+    {
+      flattened_box[index] = row[i];
+      index++;
+    }
+    rowCount++;
+  } EndForPencil
+
+  // check if the array is flattened properly
+  // printf("flattened_box:\n");
+  //   for (int i = 0; i < num_entries; i++) {
+  //       printf("%lf ", flattened_box[i]);
+  //   }
+  //   printf("\n");
+
+  return flattened_box;
+}
+
+void FArrayBox::unpackAll(const Box& a_subbox,Real* flattened_box,int a_comp,int a_numcomp)
+{
+  CH_assert(m_domain.contains(a_subbox));
+  Real rowCount = 0;
+  Real num_entries = 0; // number of total entries in this box
+  int index=0;
+  ForAllThisPencil(Real, a_subbox, 0, 1)
+  {
+    Real* pencil = &thisR;
+    for (int i=0; i<thisLen; i++)
+    {
+      pencil[i] = flattened_box[index];
+      index++;
+    }
+  }   EndForPencil
+
+  // ForAllThisCPencil(Real,a_subbox,a_comp,a_numcomp); // a_comp,a_numcomp
+  // {
+  //   Real* row = &thisR;
+  //   for (int i = 0; i < thisLen; i++)
+  //   {
+  //     row[i] = flattened_box[index];
+  //     index++;
+  //   }
+  //   rowCount++;
+  // } EndForPencil
+  
+  // check if the array is flattened properly
+  // printf("unpacked box:\n");
+  // ForAllThisPencil(Real, a_subbox, 0, 1)
+  // {
+  //   Real* pencil = &thisR;
+  //   for (int i=0; i<thisLen; i++)
+  //   {
+  //     cout<<"Row "<<rowCount<<", column "<<i<<": "<<pencil[i]<<endl;
+  //   }
+  //   rowCount++;
+  // }   EndForPencil
+  // printf("flattened_box:\n");
+  //   for (int i = 0; i < num_entries; i++) {
+  //       printf("%lf ", flattened_box[i]);
+  //   }
+  //   printf("\n");
+}
+
+void FArrayBox::setSpecificValTest(const Box& a_subbox,int a_comp,int a_numcomp)
+{
+  CH_assert(m_domain.contains(a_subbox));
+  Real rowCount = 0;
+  Real colCount = 0;
+  Real num_entries = 0; // number of total entries in this box
+  int index=0;
+  ForAllThisPencil(Real, a_subbox, 0, 1)
+  {
+    Real* pencil = &thisR;
+    if(rowCount==0){
+      colCount=0;
+      for (int i=0; i<thisLen; i++)
+      {
+        if(colCount==0){
+          pencil[i] = 1.0;
+        }else if (colCount==1){
+          pencil[i] = 2.0;
+        }else if(colCount==2){
+          pencil[i] = 3.0;
+        }else if(colCount==3){
+          pencil[i] = 4.0;
+        }else if(colCount==4){
+          pencil[i] = 5.0;
+        }
+        colCount++;
+      }
+      index++;
+    }
+    rowCount++;
+  }   EndForPencil
+
+  // check if the array is flattened properly
+  // printf("  setting 1 2 3 4 5:\n");
+  // rowCount = 0;
+  // ForAllThisPencil(Real, a_subbox, 0, 1)
+  // {
+  //   Real* pencil = &thisR;
+  //   for (int i=0; i<thisLen; i++)
+  //   {
+  //     cout<<"  Row "<<rowCount<<", column "<<i<<": "<<pencil[i]<<endl;
+  //   }
+  //   rowCount++;
+  // }   EndForPencil
+  
+}
+
+
 Real FArrayBox::norm(const Box& a_subbox,
                      int        a_p,
                      int        a_comp,

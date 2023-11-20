@@ -21,12 +21,17 @@
 #include "QuadCFInterp.H"
 //#include "InterpF_F.H"
 #include "NamespaceHeader.H"
+#include "FArrayBox.H"
 
 // initialize static members here.
 // 0 = arithmetic, 1 = harmonic
 int ViscousTensorOpFactory::s_coefficientAverageType = 1;
 //int ViscousTensorOp::s_prolongType = piecewiseConstant;
 int ViscousTensorOp::s_prolongType = linearInterp;
+// true -- only do exchange once per multicolored smooth cycle,
+// false (default) -- do exchange before each multicolored pass (4x per cycle)
+bool ViscousTensorOp::s_lazy_gsrb = false;
+
 
 void
 vtogetMultiColors(Vector<IntVect>& a_colors)
@@ -1139,18 +1144,32 @@ relax(LevelData<FArrayBox>&       a_phi,
   int whichIter = 0;
   bool done = false;
 
+
+  
   while (whichIter < a_iterations && !done)
     {
       if (whichIter > m_relaxMinIter && m_relaxTolerance >  TINY_NORM)
         assignLocal(prevPhi,a_phi); // no point doing this if we aren't testing
 
+      // "lazy" = call once/iteration. "not lazy" = call every color
+      if (s_lazy_gsrb)
+        {
+          // this calls exchange whether or not there is a coarse level
+          homogeneousCFInterp(a_phi);
+        }
+      
       // Loop over all possibilities (in all dimensions)
       for (int icolor = 0; icolor < m_colors.size(); icolor++)
         {
           const IntVect& color= m_colors[icolor];
-          // this calls exchange whether or not there is a coarse level
-          homogeneousCFInterp(a_phi);
 
+          // "lazy" = call once/iteration. "not lazy" = call every color
+          if (!s_lazy_gsrb)
+            {
+              // this calls exchange whether or not there is a coarse level
+              homogeneousCFInterp(a_phi);
+            }
+          
           //after this lphi = L(phi)
           //this call contains bcs but no exchange
           applyOpNoExchange(lphi, a_phi, true);
@@ -1363,6 +1382,7 @@ defineRelCoef()
           m_relaxCoef[dit()].copy((*m_acoef)[dit()], src,dst,ncomp);
         }
       m_relaxCoef[dit()] *= m_alpha;
+      
       for (int idir = 0; idir < SpaceDim; idir++)
         {
           FORT_DECRINVRELCOEFVTOP(CHF_FRA(m_relaxCoef[dit()]),
@@ -1387,7 +1407,18 @@ defineRelCoef()
                             CHF_REAL(m_safety),
                             CHF_BOX(grid),
                             CHF_INT(m_ncomp));
-
+      // cout<<"in Viscous Tensor Op, dit() "<<dit()<<", m_relaxCoef[dit()].norm(0) "<<m_relaxCoef[dit()].norm(0)<<endl;
+      
+      DisjointBoxLayout dbl = m_relaxCoef.disjointBoxLayout();
+      DataIterator dit1 = m_relaxCoef.dataIterator();
+      // cout<<"in Viscous Tensor Op, dit() "<<dit()<<endl;
+      for (dit1.reset(); dit1.ok(); ++dit1) 
+        {
+        const Box& box = dbl[dit1()];
+        FArrayBox& fab = m_relaxCoef[dit1()];
+        // fab.printAll(box);
+        } 
+        // cout<<"in Viscous Tensor Op end, dit() "<<dit()<<endl;
       CH_assert(m_relaxCoef[dit()].norm(0) < 1.0e+15);
 
     }
