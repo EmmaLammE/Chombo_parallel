@@ -929,7 +929,6 @@
       REAL_T dx
       integer idir
       integer ncomp
-      integer :: k
       integer ii,jj
       integer i,j
       integer icomp

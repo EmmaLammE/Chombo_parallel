@@ -27,6 +27,8 @@
       integer icellBoxlo0,icellBoxlo1
       integer icellBoxhi0,icellBoxhi1
       integer dir
+      integer :: k, l, m, n
+      integer :: kk, ll, mm, nn
       integer i,j
       integer ii,jj
       do j = icellBoxlo1,icellBoxhi1

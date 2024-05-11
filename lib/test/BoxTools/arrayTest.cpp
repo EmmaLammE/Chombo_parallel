@@ -284,6 +284,8 @@ main(int argc, char** argv)
   regl1[d1].setVal(1);  regl1[d2].setVal(2); regl1[d4].setVal(800);
   regl2[d3].setVal(30, 0); regl2[d3].setVal(33, 1); //leave d5 uninitialized
 
+  // bbl2 - BoxLayout: destination grid
+  // destData - LayoutData<Vector<RefCountedPtr<T> > >&;
   regl1.generalCopyTo(bbl2, destData, regl1.interval(), domain);
 
   if (destData[d3].size() != 2)

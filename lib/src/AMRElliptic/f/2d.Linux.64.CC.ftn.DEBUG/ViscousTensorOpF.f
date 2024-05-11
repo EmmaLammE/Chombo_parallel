@@ -16,7 +16,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nvelcomp
       integer ivello0,ivello1
       integer ivelhi0,ivelhi1
@@ -99,7 +100,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nlphfabcomp
       integer ilphfablo0,ilphfablo1
       integer ilphfabhi0,ilphfabhi1
@@ -187,14 +189,20 @@
             jjd = chf_id(derivdir, 1)
             do veldir = 0, 2 -1
                if(facedir .eq. derivdir) then
-                  gphiH(veldir, derivdir ,facedir) = (phifab(i+iid,j+jjd,veldir) - phifab(i ,j ,veldir))/dx
-                  gphiL(veldir, derivdir ,facedir) = (phifab(i ,j ,veldir) - phifab(i-iid,j-jjd,veldir))/dx
+                  gphiH(veldir, derivdir ,facedir) = (phifab(i+iid,j+jjd
+     &,veldir) - phifab(i ,j ,veldir))/dx
+                  gphiL(veldir, derivdir ,facedir) = (phifab(i ,j ,veldi
+     &r) - phifab(i-iid,j-jjd,veldir))/dx
                else
-                  gphiH(veldir, derivdir ,facedir) = ((1.0d0)/((4.0d0)*dx))*(
-     $ phifab(i+iid+iif,j+jjd+jjf,veldir) - phifab(i-iid+iif,j-jjd+jjf,veldir) +
+                  gphiH(veldir, derivdir ,facedir) = ((1.0d0)/((4.0d0)*d
+     &x))*(
+     $ phifab(i+iid+iif,j+jjd+jjf,veldir) - phifab(i-iid+iif,j-jjd+jjf,v
+     &eldir) +
      $ phifab(i+iid ,j+jjd ,veldir) - phifab(i-iid ,j-jjd ,veldir) )
-                  gphiL(veldir, derivdir ,facedir) = ((1.0d0)/((4.0d0)*dx))*(
-     $ phifab(i+iid-iif,j+jjd-jjf,veldir) - phifab(i-iid-iif,j-jjd-jjf,veldir) +
+                  gphiL(veldir, derivdir ,facedir) = ((1.0d0)/((4.0d0)*d
+     &x))*(
+     $ phifab(i+iid-iif,j+jjd-jjf,veldir) - phifab(i-iid-iif,j-jjd-jjf,v
+     &eldir) +
      $ phifab(i+iid ,j+jjd ,veldir) - phifab(i-iid ,j-jjd ,veldir) )
                endif
             enddo
@@ -204,17 +212,23 @@
          divuL(facedir) = (0.0d0)
          divuH(facedir) = (0.0d0)
          do veldir = 0, 2 -1
-            divuL(facedir)= divuL(facedir) + gphiL(veldir, veldir, facedir)
-            divuH(facedir)= divuH(facedir) + gphiH(veldir, veldir, facedir)
+            divuL(facedir)= divuL(facedir) + gphiL(veldir, veldir, faced
+     &ir)
+            divuH(facedir)= divuH(facedir) + gphiH(veldir, veldir, faced
+     &ir)
          enddo
       enddo
       do facedir = 0, 2 -1
          do veldir = 0, 2 -1
-            fluxL(veldir, facedir) = etaL(facedir)*(gphiL(facedir, veldir, facedir) + gphiL(veldir, facedir, facedir))
-            fluxH(veldir, facedir) = etaH(facedir)*(gphiH(facedir, veldir, facedir) + gphiH(veldir, facedir, facedir))
+            fluxL(veldir, facedir) = etaL(facedir)*(gphiL(facedir, veldi
+     &r, facedir) + gphiL(veldir, facedir, facedir))
+            fluxH(veldir, facedir) = etaH(facedir)*(gphiH(facedir, veldi
+     &r, facedir) + gphiH(veldir, facedir, facedir))
             if(veldir .eq. facedir) then
-               fluxL(veldir, facedir) = fluxL(veldir, facedir) + lamL(facedir)*divuL(facedir)
-               fluxH(veldir, facedir) = fluxH(veldir, facedir) + lamH(facedir)*divuH(facedir)
+               fluxL(veldir, facedir) = fluxL(veldir, facedir) + lamL(fa
+     &cedir)*divuL(facedir)
+               fluxH(veldir, facedir) = fluxH(veldir, facedir) + lamH(fa
+     &cedir)*divuH(facedir)
             endif
          enddo
       enddo
@@ -231,7 +245,8 @@
       lphfab(i,j,1) = alpha*aphi(1) + beta*divf(1)
       enddo
       enddo
-      ch_flops=ch_flops+(iregionhi0- iregionlo0+1)*(iregionhi1- iregionlo1+1)*(4 + 6*2 + 12*(2*2))
+      ch_flops=ch_flops+(iregionhi0- iregionlo0+1)*(iregionhi1- iregionl
+     &o1+1)*(4 + 6*2 + 12*(2*2))
       return
       end
       subroutine GETFLUXVTOPNOBCS(
@@ -259,7 +274,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nfluxcomp
       integer ifluxlo0,ifluxlo1
       integer ifluxhi0,ifluxhi1
@@ -305,10 +321,12 @@
          jjd = chf_id(derivdir, 1)
          do veldir = 0, 2 -1
             if(facedir .eq. derivdir) then
-               gphi(veldir, derivdir) = (phifab(i,j,veldir) - phifab(i-iid,j-jjd,veldir))/dx
+               gphi(veldir, derivdir) = (phifab(i,j,veldir) - phifab(i-i
+     &id,j-jjd,veldir))/dx
             else
                gphi(veldir, derivdir) = ((1.0d0)/((4.0d0)*dx))*(
-     $ phifab(i+iid-iif,j+jjd-jjf,veldir) - phifab(i-iid-iif,j-jjd-jjf,veldir) +
+     $ phifab(i+iid-iif,j+jjd-jjf,veldir) - phifab(i-iid-iif,j-jjd-jjf,v
+     &eldir) +
      $ phifab(i+iid ,j+jjd ,veldir) - phifab(i-iid ,j-jjd ,veldir) )
             endif
          enddo
@@ -442,7 +460,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer igradlo0,igradlo1
       integer igradhi0,igradhi1
       REAL*8 grad(
@@ -557,7 +576,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer igradvelfacelo0,igradvelfacelo1
       integer igradvelfacehi0,igradvelfacehi1
       REAL*8 gradvelface(
@@ -643,7 +663,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer idivvello0,idivvello1
       integer idivvelhi0,idivvelhi1
       REAL*8 divvel(
@@ -703,7 +724,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer idivvello0,idivvello1
       integer idivvelhi0,idivvelhi1
       REAL*8 divvel(
@@ -801,7 +823,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nrelcoefcomp
       integer irelcoeflo0,irelcoeflo1
       integer irelcoefhi0,irelcoefhi1
@@ -829,7 +852,6 @@
       REAL*8 dx
       integer idir
       integer ncomp
-      integer :: k
       integer ii,jj
       integer i,j
       integer icomp
@@ -1040,7 +1062,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nlhscomp
       integer ilhslo0,ilhslo1
       integer ilhshi0,ilhshi1
@@ -1090,7 +1113,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nphicomp
       integer iphilo0,iphilo1
       integer iphihi0,iphihi1
@@ -1134,7 +1158,8 @@
       integer*8 ch_flops
       COMMON/ch_timer/ ch_flops
       integer CHF_ID(0:5,0:5)
-      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0,0,0,0,1,0 ,0,0,0,0,0,1 /
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
       integer nslopescomp
       integer islopeslo0,islopeslo1
       integer islopeshi0,islopeshi1

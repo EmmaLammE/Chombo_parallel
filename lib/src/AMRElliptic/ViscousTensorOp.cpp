@@ -1371,20 +1371,21 @@ void
 ViscousTensorOp::
 defineRelCoef()
 {
-
   DisjointBoxLayout grids = m_relaxCoef.disjointBoxLayout();
   for (DataIterator dit(grids); dit.ok(); ++dit)
-    {
+  {
+      // cout<<"############################# \nlevel: "<<dit()<<", 1 in Viscous Tensor Op end, m_relaxCoef[dit()].norm(0)"<<m_relaxCoef[dit()].norm(0)<<endl;
       const Box& grid = grids.get(dit());
+      // cout<<"  box "<<grid<<endl;
       for (int ivar = 0; ivar < SpaceDim; ivar++)
-        {
+      {
           int src = 0; int dst = ivar; int ncomp = 1;
           m_relaxCoef[dit()].copy((*m_acoef)[dit()], src,dst,ncomp);
-        }
+      }
       m_relaxCoef[dit()] *= m_alpha;
-      
+      // cout<<"2 in Viscous Tensor Op end, m_relaxCoef[dit()].norm(0)"<<m_relaxCoef[dit()].norm(0)<<endl;
       for (int idir = 0; idir < SpaceDim; idir++)
-        {
+      {
           FORT_DECRINVRELCOEFVTOP(CHF_FRA(m_relaxCoef[dit()]),
                                   CHF_FRA((*m_eta)[dit()][idir]),
                                   CHF_FRA((*m_lambda)[dit()][idir]),
@@ -1397,9 +1398,8 @@ defineRelCoef()
           CH_assert(abs(m_relaxCoef[dit()].min(0)) > 1.0e-15
                     && abs(m_relaxCoef[dit()].max(0)) > 1.0e-15);
 #endif
-
-        }
-
+      }
+      // cout<<"4 in Viscous Tensor Op end, m_relaxCoef[dit()].norm(0)"<<m_relaxCoef[dit()].norm(0)<<endl;
       //now invert so lambda = stable lambda for variable coef lapl
       //(according to phil, this is the correct lambda)
 
@@ -1407,18 +1407,19 @@ defineRelCoef()
                             CHF_REAL(m_safety),
                             CHF_BOX(grid),
                             CHF_INT(m_ncomp));
-      // cout<<"in Viscous Tensor Op, dit() "<<dit()<<", m_relaxCoef[dit()].norm(0) "<<m_relaxCoef[dit()].norm(0)<<endl;
+      // cout<<"3 in Viscous Tensor Op, dit() "<<dit()<<", m_relaxCoef[dit()].norm(0) "<<m_relaxCoef[dit()].norm(0)<<endl;
       
       DisjointBoxLayout dbl = m_relaxCoef.disjointBoxLayout();
       DataIterator dit1 = m_relaxCoef.dataIterator();
       // cout<<"in Viscous Tensor Op, dit() "<<dit()<<endl;
       for (dit1.reset(); dit1.ok(); ++dit1) 
-        {
+      {
         const Box& box = dbl[dit1()];
         FArrayBox& fab = m_relaxCoef[dit1()];
         // fab.printAll(box);
-        } 
-        // cout<<"in Viscous Tensor Op end, dit() "<<dit()<<endl;
+      } 
+        // cout<<"in Viscous Tensor Op end, m_relaxCoef[dit()]"<<m_relaxCoef[dit()]<<endl;
+      // cout<<"4 in Viscous Tensor Op end, m_relaxCoef[dit()].norm(0)"<<m_relaxCoef[dit()].norm(0)<<endl;
       CH_assert(m_relaxCoef[dit()].norm(0) < 1.0e+15);
 
     }

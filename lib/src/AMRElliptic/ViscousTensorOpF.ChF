@@ -560,6 +560,9 @@ c     remember this is partial vdivdir/partial xdivdir
      $     chf_int[idir],
      $     chf_int[ncomp])
 
+c EL - Declare all indices used in the subroutine
+      integer :: k
+
       integer chf_ddecl[ii;jj;kk]
       integer chf_ddecl[i;j;k]
       integer icomp
@@ -578,7 +581,7 @@ c     remember this is partial vdivdir/partial xdivdir
 
          lamh = lambda(chf_ix[i+ii;j+jj;k+kk],0)
          laml = lambda(chf_ix[i   ;j   ;k   ],0)
-
+c         print *, "    idir icomp",idir, icomp," i,j:",i,j,"relcoef:", relcoef(chf_ix[i;j;k],icomp) 
          if(icomp .eq. idir) then
 
             incr =
@@ -588,18 +591,22 @@ c     remember this is partial vdivdir/partial xdivdir
      $        two*eta(chf_ix[i   ;j   ;k   ],0) +
      $        lambda (chf_ix[i   ;j   ;k   ],0)
      $        )/(dx*dx)
-
+c              print *, "      1 eta ",eta(chf_ix[i+ii;j+jj;k+kk],0),"lambda ",lambda(chf_ix[i+ii;j+jj;k+kk],0),"eta ",eta(chf_ix[i   ;j   ;k   ],0),"lambda ",lambda(chf_ix[i   ;j   ;k   ],0)
          else
             incr =
      $         beta*(
      $        eta(chf_ix[i+ii;j+jj;k+kk],0) +
      $        eta(chf_ix[i   ;j   ;k   ],0)
      $        )/(dx*dx)
-
+c            print *, "      2 eta ",eta(chf_ix[i+ii;j+jj;k+kk],0),eta(chf_ix[i   ;j   ;k   ],0)
          endif
-
+        
+c         print *, "      incr:", incr
          relcoef(chf_ix[i;j;k], icomp) = relcoef(chf_ix[i;j;k],icomp) - incr
          relconew = relcoef(chf_ix[i;j;k],icomp)
+c         print *, "      relcoef:", relcoef(chf_ix[i;j;k],icomp) 
+c         EL - debugging relcoef blow up to nan 
+c          print *, "i,j:",i,j,"incr:",incr,"relcoef(chf_ix[i;j;k], icomp):",relcoef(chf_ix[i;j;k], icomp)
 
          chf_enddo
       enddo

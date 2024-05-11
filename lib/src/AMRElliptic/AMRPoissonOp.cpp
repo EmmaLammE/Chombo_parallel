@@ -73,7 +73,7 @@ void AMRPoissonOp::define(const DisjointBoxLayout& a_grids,
   CH_TIME("AMRPoissonOp::define1");
 
   amrpgetMultiColors(m_colors);
-
+  // EL - didn't use this
   this->define(a_grids, a_gridsCoarser, a_dxLevel, a_refRatio, a_domain, a_bc,
                a_exchange, a_cfregion, a_nComp);
   m_refToFiner = a_refRatioFiner;

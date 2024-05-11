@@ -81,6 +81,7 @@ ProtoEdgeToCellPatchMax(BaseFab<Real>      & a_cellData,
 
 #endif
 // ----------------------------------------------------------------
+// EL - called from AmrIce.cpp:4925
 void EdgeToCell(const LevelData<FluxBox>& a_edgeData,
                 LevelData<FArrayBox>& a_cellData)
 {

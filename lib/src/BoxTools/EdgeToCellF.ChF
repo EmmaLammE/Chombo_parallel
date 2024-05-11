@@ -21,6 +21,11 @@ c -----------------------------------------------------------------
      &                      CHF_BOX[cellBox],
      &                      CHF_CONST_INT[dir])
 
+
+c EL - Declare all indices used in the subroutine
+      integer :: k, l, m, n
+      integer :: kk, ll, mm, nn
+
 c ::: local variables
       integer CHF_DDECL[i;j;k;l;m;n]
       integer CHF_DDECL[ii;jj;kk;ll;mm;nn]
@@ -37,6 +42,10 @@ c ::: local variables
       cellData(CHF_IX[i;j;k;l;m;n]) = half*(
      &                    edgeData(CHF_IX[i;j;k;l;m;n])
      &                   +edgeData(CHF_IX[ii;jj;kk;ll;mm;nn]))
+
+c EL - Print the cell data and index
+c      print *, "Cell Data at", i, j, " is: ",cellData(CHF_IX[i;j;k;l;m;n])
+c      write(*, '(A, 6(I3), A, F6.2)') 'Cell Data at [', i, j, k, l, m, n, ']: ', cellData(CHF_IX[i;j;k;l;m;n])
 
       CHF_ENDDO
 
