@@ -94,6 +94,7 @@ class MGLevelOp : public LinearOp<T>, public MGLevelOpObserver<T>
   MGLevelOp()
     :LinearOp<T>(),
      MGLevelOpObserver<T>(),
+     m_update_operator(false),
      m_observers(),
      m_coarseningFactors()
   {
@@ -267,11 +268,28 @@ class MGLevelOp : public LinearOp<T>, public MGLevelOpObserver<T>
   {
   }
 
+  virtual void UpdateOperator(const T&  a_phi,
+                              const T*   a_phiCoarse,
+                              int        a_depth = 0,
+                              int        a_iter  = 0,
+                              bool       a_homogeneous = false)
+  {
+      MayDay::Error("UpdateOperator not defined");
+  } 
+
+  virtual void AverageOperator(const MGLevelOp<T>& a_operator,
+                               int                 a_depth = 0)
+  {
+      MayDay::Error("AverageOperator not defined");
+  }
+
   //! Returns the number of objects observing this operator.
   int numObservers() const
   {
     return m_observers.size();
   }
+
+  bool m_update_operator;
 
   private:
 
@@ -389,6 +407,7 @@ public:
   */
   int  m_depth, m_defaultDepth, m_pre, m_post, m_bottom, m_cycle, m_numMG;
   bool m_homogeneous;
+  int  m_verbosity;
   LinearSolver<T>*  m_bottomSolver;
 
   ///
@@ -443,6 +462,7 @@ MultiGrid<T>::MultiGrid()
    m_cycle(1),
    m_numMG(1),
    m_homogeneous(true),
+   m_verbosity(3),
    m_defined(false)
 {
 }

@@ -561,7 +561,9 @@ c     remember this is partial vdivdir/partial xdivdir
      $     chf_int[ncomp])
 
 c EL - Declare all indices used in the subroutine
-      integer :: k
+c DFM -- this breaks in 3D (ChomboFortran automatically declares
+c        the indices it needs for the current dimensionality
+c      integer :: k
 
       integer chf_ddecl[ii;jj;kk]
       integer chf_ddecl[i;j;k]
