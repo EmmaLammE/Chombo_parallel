@@ -111,7 +111,7 @@ makefiles+=Make.defs.local
 ## Configuration variables
 #DIM           =
 #DEBUG         =
-#OPT           =
+OPT           = HIGH
 #PRECISION     =
 #PROFILE       =
 CXX           = gcc
