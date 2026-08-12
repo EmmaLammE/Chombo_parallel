@@ -20,8 +20,9 @@
 #include "CoarseAverage.H"
 #include "QuadCFInterp.H"
 //#include "InterpF_F.H"
-#include "NamespaceHeader.H"
 #include "FArrayBox.H"
+#include "NamespaceHeader.H"
+
 
 // initialize static members here.
 // 0 = arithmetic, 1 = harmonic

@@ -93,7 +93,7 @@ void FASMultiGrid<T>::define(MGLevelOpFactory<T>& a_factory,
                              const ProblemDomain& a_domain,
                              int                  a_maxDepth,
                              MGLevelOp<T>*        a_finestOp)
-                             {
+{
   MultiGrid<T>::define(a_factory,a_bottomSolver,a_domain, a_maxDepth, a_finestOp);
 
   // Should never be homogeneous in the FAS case, as we're solving the full problem
@@ -169,37 +169,48 @@ void FASMultiGrid<T>::oneCycle(T& a_phi, const T& a_rhs, T* a_phiCoarse)
   m_phiCoarse.resize(this->m_depth);
   m_phiCoarse[0] = a_phiCoarse;
 
+  // Update the operator on finer grid then average down
+  if (this->m_op[0]->m_update_operator) {
+      this->m_op[0]->UpdateOperator(a_phi, m_phiCoarse[0], 0, iter, false); 
+  }
   for (int depth = 1; depth < this->m_depth; depth++)
   {
-    if (m_phiCoarse[depth-1] == NULL)
-    {
+    // Update operator on subsequent depth
+    if (this->m_op[0]->m_update_operator) {
+        this->m_op[depth]->AverageOperator(*(this->m_op[0]), depth);
+    }
+
+    if (m_phiCoarse[depth-1] == NULL) {
       m_phiCoarse[depth] = NULL;
     }
     else
-    {
-      const T& phiCoarseGridFiner = *m_phiCoarse[depth-1];
-
-      m_phiCoarse[depth] = new T();
-
-      T scratchCrse;
-      this->m_op[depth]->create(scratchCrse,  phiCoarseGridFiner);
-      this->m_op[depth]->setToZero(scratchCrse);
-
-      this->m_op[depth]->createCoarser(*(m_phiCoarse[depth]), phiCoarseGridFiner, true);
-      this->m_op[depth]->restrictR(*(m_phiCoarse[depth]), phiCoarseGridFiner);
-
-      // If the coarse level is so coarse that it only has one cell then we can't do
-      // CF interpolation with it, so delete it
-      const DisjointBoxLayout& dbl =  m_phiCoarse[depth]->disjointBoxLayout();
-      const Box& coarseDomBox = dbl.physDomain().domainBox();
-      if (coarseDomBox.smallEnd() == coarseDomBox.bigEnd())
       {
-        delete m_phiCoarse[depth];
-        m_phiCoarse[depth] = NULL;
+        if (this->m_verbosity > 4) {
+          pout() << " ... depth ? " << depth <<"\n";
+        }
+        const T& phiCoarseGridFiner = *m_phiCoarse[depth-1];
+        
+        m_phiCoarse[depth] = new T();
+        
+        T scratchCrse;
+        this->m_op[depth]->create(scratchCrse,  phiCoarseGridFiner);
+        this->m_op[depth]->setToZero(scratchCrse);
+        
+        this->m_op[depth]->createCoarser(*(m_phiCoarse[depth]), phiCoarseGridFiner, true);
+        this->m_op[depth]->restrictR(*(m_phiCoarse[depth]), phiCoarseGridFiner);
+        
+        // If the coarse level is so coarse that it only has one cell then we can't do
+        // CF interpolation with it, so delete it
+        const DisjointBoxLayout& dbl =  m_phiCoarse[depth]->disjointBoxLayout();
+        const Box& coarseDomBox = dbl.physDomain().domainBox();
+        if (coarseDomBox.smallEnd() == coarseDomBox.bigEnd())
+          {
+            delete m_phiCoarse[depth];
+            m_phiCoarse[depth] = NULL;
+          }
       }
-    }
   }
-
+  
   // We pass in a_phi and a_rhs here
   this->cycle(0, a_phi, a_rhs);
 
@@ -232,7 +243,7 @@ void FASMultiGrid<T>::cycle(int depth, T& a_phi, const T& a_rhs)
     this->m_op[0]->incr(*this->m_correction[depth], a_phi, -1.0);
 
     // On the coarsest level, just do loads of relaxing as the bottom solve
-    this->m_op[depth  ]->relaxNF(a_phi, m_phiCoarse[depth], a_rhs, this->m_bottom);
+    this->m_op[depth  ]->relaxNF(a_phi, m_phiCoarse[depth], a_rhs, this->m_bottom, depth, true);
 
     // Subtract off new phi to get actual correction from this level
     this->m_op[0]->incr(*this->m_correction[depth], a_phi, 1.0);
@@ -264,7 +275,7 @@ void FASMultiGrid<T>::cycle(int depth, T& a_phi, const T& a_rhs)
       this->m_op[depth]->incr(*(this->m_correction[depth]), a_phi, -1.0);
 
       // Relax phi towards actual phi
-      this->m_op[depth  ]->relaxNF( a_phi, m_phiCoarse[depth], a_rhs, this->m_pre );
+      this->m_op[depth  ]->relaxNF( a_phi, m_phiCoarse[depth], a_rhs, this->m_pre, depth, true );
 
 
       // restrict this new phi to a coarser grid and store it in 'm_correction'

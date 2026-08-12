@@ -611,6 +611,7 @@ AMRMultiGrid<T>::AMRMultiGrid()
   m_numMG(1),
   m_maxDepth(-1),
   m_convergenceMetric(0.),
+  m_initial_rnorm(1E-10),
   m_bottomSolverEpsCushion(1.0),
   m_bottomSolver(NULL),
   m_inspectors()
